@@ -9,17 +9,22 @@ body {
     display: none;
 }
 
+.hidden__button{
+  display: none;
+}
+
 #root {
   height: 100vh; /* Set the height of the root element to the full viewport height */
-  width: 100%;
+  width: 100vw;
   margin: 0;
+  overflow: hidden;
   display: flex;
   align-items: center; /* Center vertically */
   justify-content: center; /* Center horizontally */
   background-color: #242424;
 }
 
-/* Remove margin: 0 auto; from the * selector to prevent interference with text alignment */
+/* Remove margin:c  0 auto; from the * selector to prevent interference with text alignment */
 * {
   font-family: Inter;
   line-height: 1.5;
@@ -60,8 +65,9 @@ button:hover {
   border-color: #646cff;
 }
 
-.button{
+.buttons{
     margin: 1px;
+    text-align: center;
 }
 
 .star {
@@ -75,7 +81,13 @@ button:hover {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 9999;
+    z-index: 111;
     transform: translate(0, 0);
     transition: transform 0.2s ease;
 }
+
+.no__button {
+  position: absolute;
+  white-space: nowrap;
+}
+

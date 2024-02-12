@@ -1,19 +1,30 @@
 document.addEventListener("DOMContentLoaded", function () {
   const stars = document.querySelectorAll(".star");
+  const subtitle = document.querySelector(".content__subtitle");
+  const buttons = document.querySelectorAll(".button");
+  const idleAnimationContainer = document.querySelector(".idle__animation");
+  const yesAnimationContainer = document.querySelector(".yes__animation");
+  const noAnimationContainer = document.querySelector(".no__animation");
+  const noButton = document.querySelector(".no__button");
+  const test = document.querySelector(".test");
 
-  // Set random initial position for each star
-  stars.forEach(function (star) {
+  let messageIndex = 0;
+  let selectedButton = null;
+  let hasStarted = false;
+
+  function setRandomPosition(star) {
     const randomX = Math.random() * window.innerWidth;
     const randomY = Math.random() * window.innerHeight;
     star.style.left = randomX + "px";
     star.style.top = randomY + "px";
-  });
+  }
 
-  // Mouse move event listener to animate stars
-  document.addEventListener("mousemove", function (e) {
+  stars.forEach(setRandomPosition);
+
+  document.addEventListener("mousemove", function () {
     stars.forEach(function (star) {
-      const randomDistanceX = (Math.random() - 0.5) * 2;
-      const randomDistanceY = (Math.random() - 0.5) * 2;
+      const randomDistanceX = (Math.random() - 0.5) * 1;
+      const randomDistanceY = (Math.random() - 0.5) * 1;
       const currentX = parseFloat(star.style.left);
       const currentY = parseFloat(star.style.top);
       const newX = currentX + randomDistanceX;
@@ -24,69 +35,150 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   const messages = [
-    "No Matter how many times you reload...",
+    "No matter how many times you reload...",
     "The stars will always align differently...",
     "...",
     "I have a question C:",
-    "Wanna be my valentines?",
-    ""
+    "Wanna be my valentine?",
+    "",
   ];
 
-  const subtitle = document.querySelector(".content__subtitle");
-  const buttons = document.querySelectorAll(".button");
-  let messageIndex = 0;
-
-  // Function to display messages sequentially
   function displayNextMessage() {
     subtitle.innerHTML = messages[messageIndex];
     messageIndex++;
     if (messageIndex === messages.length) {
-      messageIndex--;
+      messageIndex = 0;
     }
   }
 
-  // Display initial message
   displayNextMessage();
 
-  // Add click event listener to display next message or show buttons
   document.addEventListener("click", function () {
     if (messageIndex < messages.length - 1) {
       displayNextMessage();
     } else if (messageIndex === messages.length - 1) {
       subtitle.classList.add("hidden");
-      buttons.forEach(button => button.classList.remove("hidden"));
+      buttons.forEach((button) => button.classList.remove("hidden"));
+      loadIdleAnimation();
+    }
+  });
 
-      // Load Lottie animation for the idle state
-      const valentinesAnimation = lottie.loadAnimation({
-        container: document.querySelector(".valentines__animation"),
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        path: "animations/Animation - 1707449574597.json"
-      });
+  function loadIdleAnimation() {
+    idleAnimationContainer.innerHTML = `<lottie-player src="animations/Animation - 1707449574597.json" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></lottie-player>`;
+  }
 
-      // Add event listeners for button clicks
-      document.querySelector(".yes__button").addEventListener("click", function () {
-        valentinesAnimation.destroy(); // Remove previous animation
-        lottie.loadAnimation({
-          container: document.querySelector(".valentines__animation"),
-          renderer: "svg",
-          loop: true,
-          autoplay: true,
-          path: "animations\Animation - 1707449685510.json"
-        });
-      });
+  document.querySelector(".no__button").addEventListener("click", function () {
+    if (selectedButton === "yes") {
+      yesAnimationContainer.classList.add("hidden");
+    }
+    idleAnimationContainer.classList.add("hidden");
+    noAnimationContainer.innerHTML = `<lottie-player src="animations/Animation - 1707449685510.json" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></lottie-player>`;
+    noAnimationContainer.classList.remove("hidden");
+    selectedButton = "no";
+  });
 
-      document.querySelector(".no__button").addEventListener("click", function () {
-        valentinesAnimation.destroy(); // Remove previous animation
-        lottie.loadAnimation({
-          container: document.querySelector(".valentines__animation"),
-          renderer: "svg",
-          loop: true,
-          autoplay: true,
-          path: "animations\Animation - 1707450100299.json"
-        });
-      });
+  document.querySelector(".yes__button").addEventListener("click", function () {
+    console.log("clicked");
+
+    if (selectedButton === "no") {
+      noAnimationContainer.classList.add("hidden");
+    }
+
+    idleAnimationContainer.classList.add("hidden");
+
+    yesAnimationContainer.innerHTML = `
+      <lottie-player src="animations/Animation - 1707450100299.json" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></lottie-player>`;
+    yesAnimationContainer.classList.remove("hidden");
+
+    selectedButton = "yes";
+
+    document.querySelector(".yes__text").classList.remove("hidden");
+
+    document.querySelector(".yes__button").classList.add("hidden__button");
+    document.querySelector(".no__button").classList.add("hidden__button");
+  });
+
+  // Button run
+
+  noButton.addEventListener("click", function () {
+    const OFFSET = 100;
+
+    // Function to increase the scale of the yes__button
+    function increaseButtonScale() {
+      const yesButton = document.querySelector(".yes__button");
+      const currentScale = parseFloat(
+        window
+          .getComputedStyle(yesButton)
+          .getPropertyValue("transform")
+          .split(",")[3]
+      );
+      yesButton.style.transform = `scale(${currentScale * 1.3})`;
+    }
+
+    // Set interval to run the function every 1500 milliseconds
+    setInterval(increaseButtonScale, 1500);
+
+    document.addEventListener("mousemove", (e) => {
+      const x = e.pageX;
+      const y = e.pageY;
+      const buttonBox = noButton.getBoundingClientRect();
+      const horizontalDistanceFrom = distanceFromCenter(
+        buttonBox.x,
+        x,
+        buttonBox.width
+      );
+      const verticalDistanceFrom = distanceFromCenter(
+        buttonBox.y,
+        y,
+        buttonBox.height
+      );
+      const horizontalOffset = buttonBox.width / 2 + OFFSET;
+      const verticalOffset = buttonBox.height / 2 + OFFSET;
+
+      if (
+        Math.abs(horizontalDistanceFrom) <= horizontalOffset &&
+        Math.abs(verticalDistanceFrom) <= verticalOffset &&
+        buttonBox.width !== 0 &&
+        buttonBox.height !== 0
+      ) {
+        setButtonPosition(x, y, buttonBox.width, buttonBox.height);
+      }
+    });
+
+    function setButtonPosition(mouseX, mouseY, buttonWidth, buttonHeight) {
+      const windowBox = document.body.getBoundingClientRect();
+      const distanceX = mouseX - (windowBox.left + windowBox.width / 2);
+      const distanceY = mouseY - (windowBox.top + windowBox.height / 2);
+      let newX = mouseX + distanceX - buttonWidth / 2;
+      let newY = mouseY + distanceY - buttonHeight / 2;
+
+      if (distanceFromCenter(newX, windowBox.left, buttonWidth) < 0) {
+        newX = windowBox.right - buttonWidth - OFFSET;
+      }
+      if (
+        distanceFromCenter(newX + buttonWidth, windowBox.right, buttonWidth) > 0
+      ) {
+        newX = windowBox.left + OFFSET;
+      }
+      if (distanceFromCenter(newY, windowBox.top, buttonHeight) < 0) {
+        newY = windowBox.bottom - buttonHeight - OFFSET;
+      }
+      if (
+        distanceFromCenter(
+          newY + buttonHeight,
+          windowBox.bottom,
+          buttonHeight
+        ) > 0
+      ) {
+        newY = windowBox.top + OFFSET;
+      }
+
+      noButton.style.left = `${newX}px`;
+      noButton.style.top = `${newY}px`;
+    }
+
+    function distanceFromCenter(boxPosition, mousePosition, boxSize) {
+      return boxPosition - mousePosition + boxSize / 2;
     }
   });
 });
