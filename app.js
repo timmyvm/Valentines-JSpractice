@@ -23,8 +23,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.addEventListener("mousemove", function () {
     stars.forEach(function (star) {
-      const randomDistanceX = (Math.random() - 0.5) * 1;
-      const randomDistanceY = (Math.random() - 0.5) * 1;
+      const randomDistanceX = (Math.random() - 0.5) * 2.5;
+      const randomDistanceY = (Math.random() - 0.5) * 2.5;
       const currentX = parseFloat(star.style.left);
       const currentY = parseFloat(star.style.top);
       const newX = currentX + randomDistanceX;
@@ -101,84 +101,87 @@ document.addEventListener("DOMContentLoaded", function () {
   // Button run
 
   noButton.addEventListener("click", function () {
+    const yesButton = document.querySelector(".yes__button");
     const OFFSET = 100;
+    let scaleFactor = 1;
+    const scaleing = 1.5
 
     // Function to increase the scale of the yes__button
     function increaseButtonScale() {
-      const yesButton = document.querySelector(".yes__button");
-      const currentScale = parseFloat(
-        window
-          .getComputedStyle(yesButton)
-          .getPropertyValue("transform")
-          .split(",")[3]
-      );
-      yesButton.style.transform = `scale(${currentScale * 1.3})`;
+        scaleFactor *= scaleing;
+        yesButton.style.transform = `scale(${scaleFactor})`;
+
+        // Repeat the function call until the scale reaches 5
+        if (scaleFactor < 5) {
+            setTimeout(increaseButtonScale, 1500);
+        }
     }
 
-    // Set interval to run the function every 1500 milliseconds
-    setInterval(increaseButtonScale, 1500);
+    // Start increasing the scale
+    increaseButtonScale();
 
     document.addEventListener("mousemove", (e) => {
-      const x = e.pageX;
-      const y = e.pageY;
-      const buttonBox = noButton.getBoundingClientRect();
-      const horizontalDistanceFrom = distanceFromCenter(
-        buttonBox.x,
-        x,
-        buttonBox.width
-      );
-      const verticalDistanceFrom = distanceFromCenter(
-        buttonBox.y,
-        y,
-        buttonBox.height
-      );
-      const horizontalOffset = buttonBox.width / 2 + OFFSET;
-      const verticalOffset = buttonBox.height / 2 + OFFSET;
+        const x = e.pageX;
+        const y = e.pageY;
+        const buttonBox = noButton.getBoundingClientRect();
+        const horizontalDistanceFrom = distanceFromCenter(
+            buttonBox.x,
+            x,
+            buttonBox.width
+        );
+        const verticalDistanceFrom = distanceFromCenter(
+            buttonBox.y,
+            y,
+            buttonBox.height
+        );
+        const horizontalOffset = buttonBox.width / 2 + OFFSET;
+        const verticalOffset = buttonBox.height / 2 + OFFSET;
 
-      if (
-        Math.abs(horizontalDistanceFrom) <= horizontalOffset &&
-        Math.abs(verticalDistanceFrom) <= verticalOffset &&
-        buttonBox.width !== 0 &&
-        buttonBox.height !== 0
-      ) {
-        setButtonPosition(x, y, buttonBox.width, buttonBox.height);
-      }
+        if (
+            Math.abs(horizontalDistanceFrom) <= horizontalOffset &&
+            Math.abs(verticalDistanceFrom) <= verticalOffset &&
+            buttonBox.width !== 0 &&
+            buttonBox.height !== 0
+        ) {
+            setButtonPosition(x, y, buttonBox.width, buttonBox.height);
+        }
     });
 
     function setButtonPosition(mouseX, mouseY, buttonWidth, buttonHeight) {
-      const windowBox = document.body.getBoundingClientRect();
-      const distanceX = mouseX - (windowBox.left + windowBox.width / 2);
-      const distanceY = mouseY - (windowBox.top + windowBox.height / 2);
-      let newX = mouseX + distanceX - buttonWidth / 2;
-      let newY = mouseY + distanceY - buttonHeight / 2;
+        const windowBox = document.body.getBoundingClientRect();
+        const distanceX = mouseX - (windowBox.left + windowBox.width / 2);
+        const distanceY = mouseY - (windowBox.top + windowBox.height / 2);
+        let newX = mouseX + distanceX - buttonWidth / 2; 
+        let newY = mouseY + distanceY - buttonHeight / 2; 
 
-      if (distanceFromCenter(newX, windowBox.left, buttonWidth) < 0) {
-        newX = windowBox.right - buttonWidth - OFFSET;
-      }
-      if (
-        distanceFromCenter(newX + buttonWidth, windowBox.right, buttonWidth) > 0
-      ) {
-        newX = windowBox.left + OFFSET;
-      }
-      if (distanceFromCenter(newY, windowBox.top, buttonHeight) < 0) {
-        newY = windowBox.bottom - buttonHeight - OFFSET;
-      }
-      if (
-        distanceFromCenter(
-          newY + buttonHeight,
-          windowBox.bottom,
-          buttonHeight
-        ) > 0
-      ) {
-        newY = windowBox.top + OFFSET;
-      }
+        if (distanceFromCenter(newX, windowBox.left, buttonWidth) < 0) {
+            newX = windowBox.right - buttonWidth - OFFSET;
+        }
+        if (
+            distanceFromCenter(newX + buttonWidth, windowBox.right, buttonWidth) > 0
+        ) {
+            newX = windowBox.left + OFFSET;
+        }
+        if (distanceFromCenter(newY, windowBox.top, buttonHeight) < 0) {
+            newY = windowBox.bottom - buttonHeight - OFFSET;
+        }
+        if (
+            distanceFromCenter(
+                newY + buttonHeight,
+                windowBox.bottom,
+                buttonHeight
+            ) > 0
+        ) {
+            newY = windowBox.top + OFFSET;
+        }
 
-      noButton.style.left = `${newX}px`;
-      noButton.style.top = `${newY}px`;
+        noButton.style.left = `${newX}px`;
+        noButton.style.top = `${newY}px`;
     }
 
     function distanceFromCenter(boxPosition, mousePosition, boxSize) {
-      return boxPosition - mousePosition + boxSize / 2;
+        return boxPosition - mousePosition + boxSize / 2;
     }
-  });
+});
+
 });
